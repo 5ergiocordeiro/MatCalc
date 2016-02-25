@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "math.h"
 #include "Matriz.h"
 
 /*
@@ -28,12 +29,37 @@ Matriz::Matriz(Matriz & A) {
 		m_SetError(2);
 		return;
 		}
-	if (A.m_pval != NULL) {
-		memcpy(pvals, A.m_pval, size);
-		}
+	memcpy(pvals, A.m_pval, size);
 	m_Dispose();
 	* this = A;
 	m_pval = (double *) pvals;
+	m_SetError(0);
+	}
+
+Matriz::Matriz(Matriz & A, int row,int col) {
+	int nrows = A.m_nrow, ncols = A.m_ncol;
+	double * pvals;
+	int size = (nrows - 1) * (ncols - 1);
+	pvals = (double * ) malloc(size * sizeof(double));
+	if (pvals = NULL) {
+		m_Reset();
+		m_SetError(2);
+		return;
+		}
+	for (int isrc = 0, idst = 0; isrc < nrows; ++ isrc) {
+		if (isrc == row) {
+			continue;
+			}
+		for (int jsrc = 0, jdst = 0; jsrc < ncols; ++ jsrc) {
+			if (jsrc == col) {
+				continue;
+				}
+			pvals[idst * (ncols - 1) + jdst] = A.m_pval[isrc * ncols + jsrc];
+			++ jdst;
+			}
+		++ idst;
+		}
+	m_pval = pvals;
 	m_SetError(0);
 	}
 
@@ -69,26 +95,148 @@ void Matriz::m_Dispose() {
 		}
 	}
 
+double Matriz::m_Det() {
+	if (m_nrow == 1) {
+		return m_pval[0];
+	}
+	if (m_nrow == 2) {
+		return m_pval[0] * m_pval[3] - m_pval[1] * m_pval[2];
+		}
+	double result = 0;
+	for (int i = 0; i < m_nrow; ++ i) {
+		Matriz * pA = new Matriz(* this, i, 0);
+		result += ( ((i % 2) == 0) ? 1 : -1) * m_pval[i * m_ncol] * pA -> m_Det();
+		pA -> m_Dispose();
+		}
+	m_SetError(0);
+	return 0;
+	}
+
 void Matriz::m_Reset() {
 	m_nrow = m_ncol = 0;
 	m_initialized = false;
 	m_pval = NULL;
 	}
 
-double Matriz::m_PNormInftyV() { return 0; }
-double Matriz::m_PNorm0V() { return 0; }
-double Matriz::m_PNorm1V() { return 0; }
-double Matriz::m_PNormnV() { return 0; }
-double Matriz::m_PNormInftyM(int pos) { return 0; }
-double Matriz::m_PNorm0M(int pos) { return 0; }
-double Matriz::m_PNorm1M(int pos) { return 0; }
-double Matriz::m_PNormnM(int pos) { return 0; }
+double Matriz::m_PNormInftyV() {
+	int size = (m_nrow == 1) ? m_ncol : m_nrow;
+	double result = 0;
+	for (int i = 0; i < size; ++ i) {
+		double value = fabs(m_pval[i]);
+		if (i == 0 || value > result) {
+			result = value;
+			}
+		}
+	m_SetError(0);
+	return result;
+	}
 
+double Matriz::m_PNorm0V() { 
+	int size = (m_nrow == 1) ? m_ncol : m_nrow;
+	m_SetError(0);
+	return size;
+	}
+
+double Matriz::m_PNorm1V() {
+	int size = (m_nrow == 1) ? m_ncol : m_nrow;
+	double result = 0;
+	for (int i = 0; i < size; ++i) {
+		result += fabs(m_pval[i]);
+		}
+	m_SetError(0);
+	return result;
+	}
+
+double Matriz::m_PNormnV(double n) {
+	double result = 0;
+	for (int i = 0; i < m_nrow; ++ i) {
+		result += pow(fabs(m_pval[i]), n);
+		}
+	return pow(result, 1 / n);
+	}
+
+double Matriz::m_PNormInftyM(int row) {
+	double result = 0;
+	for (int i = 0; i < m_ncol; ++ i) {
+		double value = fabs(m_pval[row * m_ncol + i]);
+		if (i == 0 || value > result) {
+			result = value;
+			}
+		}
+	m_SetError(0);
+	return result;
+	}
+
+double Matriz::m_PNorm0M() {
+	double result = 0;
+	int size = m_nrow * m_ncol;
+	for (int i = 0; i < size; ++i) {
+		result += pow(fabs(m_pval[i]), 2);
+		}
+	return pow(result, 0.5);
+	}
+
+double Matriz::m_PNorm1M(int col) {
+	double result = 0;
+	for (int i = 0; i < m_nrow; ++ i) {
+		double value = fabs(m_pval[i * m_ncol + col]);
+		if (i == 0 || value > result) {
+			result = value;
+			}
+		}
+	m_SetError(0);
+	return result;
+	}
+
+double Matriz::m_PNorm2M() {
+	if (IsSimmetric()) {
+		}
+	else {
+		}
+	return 0;
+	}
 
 void Matriz::m_SetError(int errnbr) {
 	m_error = errnbr;
 	strcpy_s(m_errmsg, m_errmsgtab[errnbr]);
 	}
+
+bool Matriz::m_SolveTL(Matriz & A) {
+	int last = A.m_ncol - 1;
+	for (int i = 0; i <= last; ++ i) {
+		if (m_pval[i * m_ncol + i] == 0) {
+			m_SetError(17);
+			return false;
+			}
+		double sum = 0;
+		for (int j = i; j < last; ++ j) {
+			sum += m_pval[i * m_ncol + j] * m_pval[j * m_ncol + m_nrow];
+			}
+		A.m_pval[i] = (m_pval[i * m_ncol + m_nrow] - sum) / m_pval[i * m_ncol + i];
+		}
+	m_SetError(0);
+	return true;
+	}
+
+bool Matriz::m_SolveTU(Matriz & A) {
+	int last = A.m_ncol - 1;
+	for (int i = last; i >= 0; --i) {
+		if (m_pval[i * m_ncol + i] == 0) {
+			m_SetError(17);
+			return false;
+			}
+		double sum = 0;
+		for (int j = last; j > i; --j) {
+			sum += m_pval[i * m_ncol + j] * m_pval[i * m_ncol + m_nrow];
+			}
+		A.m_pval[i] = (m_pval[i * m_ncol + m_nrow] - sum) / m_pval[i * m_ncol + i];
+		}
+	m_SetError(0);
+	return true;
+	}
+
+
+
 
 Matriz Matriz::m_SumSub(Matriz & A, bool IsSum) {
 	if (!m_initialized) {
@@ -268,7 +416,7 @@ double Matriz::PNorm(int p) {
 		case 1:
 			return m_PNorm1V();
 		default:
-			return m_PNormnV();
+			return m_PNormnV(p);
 		}
 	}
 
@@ -277,19 +425,19 @@ double Matriz::PNorm(int p, int pos) {
 		m_SetError(6);
 		return -1;
 		}
-	if (p < -1) {
-		m_SetError(12);
+	if (p < -1 || p > 2) {
+		m_SetError(13);
 		return -1;
 		}
 	switch (p) {
 		case -1:
 			return m_PNormInftyM(pos);
 		case 0:
-			return m_PNorm0M(pos);
+			return m_PNorm0M();
 		case 1:
 			return m_PNorm1M(pos);
-		default:
-			return m_PNormnM(pos);
+		case 2:
+			return m_PNorm2M();
 		}
 	}
 
@@ -342,82 +490,114 @@ bool Matriz::IsIdentity() {
 	if (! IsSquare()) {
 		return false;
 		}
-	for (int i = 1; i < m_nrow; ++ i) {
-		for (int j = 0; j < m_nrow; ++ j) {
+	bool result = true;
+	for (int i = 0; i < m_nrow && result; ++ i) {
+		for (int j = 0; j < m_nrow && result; ++ j) {
 			double value = (i != j) ? 0 : 1;
-			if (m_pval[i * m_ncol + j] != value) {
-				return false;
-				}
+			result = (m_pval[i * m_ncol + j] == value);
 			}
 		}
 	m_SetError(0);
-	return true;
+	return result;
 	}
 
 bool Matriz::IsSimmetric() {
 	if (! IsSquare()) {
 		return false;
 		}
-	for (int i = 1; i < m_nrow; ++ i) {
-		for (int j = 0; j < i; ++ j) {
-			if (m_pval[i * m_ncol + j] != m_pval[j * m_ncol + i]) {
-				return false;
-				}
+	bool result = true;
+	for (int i = 1; i < m_nrow && result; ++ i) {
+		for (int j = 0; j < i && result; ++ j) {
+			result = (m_pval[i * m_ncol + j] == m_pval[j * m_ncol + i]);
 			}
 		}
 	m_SetError(0);
-	return true;
+	return result;
 	}
 
 bool Matriz::IsTriangularL() {
 	if (! IsSquare()) {
 		return false;
 		}
-	for (int i = 1; i < m_nrow; ++ i) {
-		for (int j = 0; j < i; ++ j) {
-			if (m_pval[j * m_ncol + i] != 0) {
-				return false;
-				}
+	bool result = true;
+	for (int i = 1; i < m_nrow && result; ++ i) {
+		for (int j = 0; j < i && result; ++ j) {
+			result = (m_pval[j * m_ncol + i] == 0);
 			}
 		}
 	m_SetError(0);
-	return true;
+	return result;
 	}
 
 bool Matriz::IsTriangularU() {
 	if (! IsSquare()) {
 		return false;
 		}
-	for (int i = 1; i < m_nrow; ++ i) {
-		for (int j = 0; j < i; ++ j) {
-			if (m_pval[i * m_ncol + j] != 0) {
-				return false;
-				}
+	bool result = true;
+	for (int i = 1; i < m_nrow && result; ++ i) {
+		for (int j = 0; j < i && result; ++ j) {
+			result = (m_pval[i * m_ncol + j] == 0);
 			}
 		}
 	m_SetError(0);
-	return true;
+	return result;
 	}
 
 bool Matriz::IsDiagonal() {
 	if (! IsSquare()) {
 		return false;
 		}
-	for (int i = 0; i < m_nrow; ++ i) {
-		for (int j = 0; j < m_nrow; ++ j) {
-			if (i != j && m_pval[i * m_ncol + j] != 0) {
-				return false;
-				}
+	bool result = true;
+	for (int i = 0; i < m_nrow && result; ++ i) {
+		for (int j = 0; j < m_nrow && result; ++ j) {
+			result = (i == j || m_pval[i * m_ncol + j] == 0);
 			}
 		}
 	m_SetError(0);
-	return true;
+	return result;
 	}
 
-double Matriz::Det() { return 0; }
-double Matriz::Trace() { return 0; }
+double Matriz::Det() {
+	if (!IsSquare()) {
+		m_SetError(7);
+		return 0;
+		}
+	return m_Det();
+	}
+
+double Matriz::Trace() {
+	if (! IsSquare()) {
+		m_SetError(7);
+		return 0;
+		}
+	double result = 0;
+	for (int i = 1; i < m_nrow; ++ i) {
+		result += m_pval[i * m_ncol + i];
+		}
+	m_SetError(0);
+	return 0;
+	}
+
 Matriz Matriz::Invert() { return * this; }
 
+bool Matriz::SolveT(Matriz & A) {
+	if (! m_system) {
+		m_SetError(15);
+		return false;
+		}
+	if (A.m_nrow != m_ncol - 1 || A.m_ncol != 1) {
+		m_SetError(16);
+		return false;
+		}
+	if (IsTriangularU()) {
+		return m_SolveTU(A);
+		}
+	if (IsTriangularL()) {
+		return m_SolveTL(A);
+		}
+	m_SetError(14);
+	return false;
+	}
 
 Matriz Matriz::Outer(Matriz & A) {
 	if (! m_initialized) {

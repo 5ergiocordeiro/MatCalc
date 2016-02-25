@@ -13,7 +13,12 @@ static char * m_errmsgtab[] = {
 	"Pelo menos uma das matrizes não é unidimensional!"
 	"A matriz não é 1 x 1!"
 	"A matriz não é unidimensional!"
-	"Norma inválida!"
+	"Norma inválida! A norma vetorial deve ser igual a -1 (infinita), 0, 1 ou n (n > 0)."
+	"Norma inválida! A norma matricial deve ser igual a -1 (infinita), 0 (Frobenius), 1 ou 2."
+	"A matriz não é triangular!"
+	"A matriz não está definida como um sistema!"
+	"O destino deve ser uma matriz n x 1, sendo n o número de incógnitas!"
+	"A matriz é singular!"
 };
 
 
@@ -31,17 +36,21 @@ private:
 	bool m_initialized, m_system;
 	double * m_pval;
 	char m_errmsg[MATRIZ_MAX_ERRMSG_SIZE + 1];
+	Matriz::Matriz(Matriz & A, int row, int col);
+	double Matriz::m_Det();
 	void Matriz::m_Dispose();
 	double Matriz::m_PNormInftyV();
 	double Matriz::m_PNorm0V();
 	double Matriz::m_PNorm1V();
-	double Matriz::m_PNormnV();
-	double Matriz::m_PNormInftyM(int pos);
-	double Matriz::m_PNorm0M(int pos);
-	double Matriz::m_PNorm1M(int pos);
-	double Matriz::m_PNormnM(int pos);
+	double Matriz::m_PNormnV(double n);
+	double Matriz::m_PNormInftyM(int row);
+	double Matriz::m_PNorm0M();
+	double Matriz::m_PNorm1M(int col);
+	double Matriz::m_PNorm2M();
 	void Matriz::m_Reset();
 	void Matriz::m_SetError(int errnbr);
+	bool Matriz::m_SolveTL(Matriz & A);
+	bool Matriz::m_SolveTU(Matriz & A);
 	Matriz Matriz::m_SumSub(Matriz & A, bool IsSum);
 	void Matriz::m_TransposeSquare();
 	void Matriz::m_TransposeNonSquare();
@@ -77,6 +86,8 @@ public:
 	double Matriz::Det();
 	double Matriz::Trace();
 	Matriz Matriz::Invert();
+	// ...... válidos apenas para sistemas triangulares
+	bool Matriz::SolveT(Matriz & A);
 	// ... válidos apenas para matrizes unidimensionais
 	Matriz Matriz::Outer(Matriz & A);
 	// ... válidos apenas para matrizes 1 x 1

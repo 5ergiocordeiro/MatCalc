@@ -18,6 +18,11 @@ Criada em 25/02/2016
 VisualStudio 2015
 Classe Matriz enriquecida.
 ========================================================================
+0.00.04
+Criada em 26/02/2016
+VisualStudio 2015
+Implementado método de eliminação Gaussiana na classe Matriz.
+========================================================================
 
 ========================================================================
     WIN32 APPLICATION : MatCalc Project Overview

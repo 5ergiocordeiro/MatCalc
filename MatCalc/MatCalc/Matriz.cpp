@@ -259,9 +259,6 @@ bool Matriz::m_SolveTU(Matriz & A) {
 	return true;
 	}
 
-
-
-
 Matriz Matriz::m_SumSub(Matriz & A, bool IsSum) {
 	if (!m_initialized) {
 		m_SetError(6);
@@ -475,19 +472,6 @@ double Matriz::PNorm(int p, int pos) {
 		}
 	}
 
-Matriz Matriz::Mult(Matriz & A) {
-	if ( !m_initialized) {
-		m_SetError(6);
-		return *this;
-		}
-	for (int i = 0; i < m_nrow; ++ i) {
-		for (int j = 0; j < m_ncol; ++ j) {
-			}
-		}
-	m_SetError(0);
-	return * this;
-	}
-
 Matriz Matriz::Mult(double value) {
 	if (! m_initialized) {
 		m_SetError(6);
@@ -655,6 +639,39 @@ bool Matriz::SolveG() {
 		}
 	m_SetError(0);
 	return true;
+	}
+
+Matriz Matriz::Mult(Matriz & B) {
+	if (! (m_initialized && B.m_initialized)) {
+		m_SetError(6);
+		return * this;
+		}
+	if (m_system || B.m_system) {
+		m_SetError(19);
+		return * this;
+		}
+	if (m_ncol != B.m_nrow) {
+		m_SetError(18);
+		return * this;
+		}
+	int sizeC = m_nrow * B.m_ncol;
+	double * pvals = (double *)calloc(sizeC, sizeof(double));
+	if (pvals == NULL) {
+		m_SetError(2);
+		return * this;
+		}
+	for (int i = 0; i < m_nrow; ++ i) {
+		for (int j = 0; j < B.m_ncol; ++ j) {
+			for (int k = 0; k < m_ncol; ++ k) {
+				pvals[i * B.m_ncol + j] += m_pval[i * m_ncol + k] * B.m_pval[k * B.m_ncol + j];
+				}
+			}
+		}
+	m_Dispose();
+	m_ncol = B.m_ncol;
+	m_pval = pvals;
+	m_SetError(0);
+	return * this;
 	}
 
 Matriz Matriz::Outer(Matriz & A) {

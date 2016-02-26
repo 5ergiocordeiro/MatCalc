@@ -21,6 +21,10 @@ static char * m_errmsgtab[] = {
 	"A matriz não está definida como um sistema!"
 	"O destino deve ser uma matriz n x 1, sendo n o número de incógnitas!"
 	"A matriz é singular!"
+	"As matrizes têm tamanhos incompatíveis! O número de linhas da segunda deve ser igual ao número de colunas da primeira."
+	"Esta operação não se aplica a sistemas."
+	// 20
+
 };
 
 
@@ -48,7 +52,7 @@ private:
 	double Matriz::m_PNormnV(double n);
 	double Matriz::m_PNormInftyM(int row);
 	double Matriz::m_PNorm0M();
-	double Matriz::m_PNorm1M(int col);
+	double Matriz::m_PNorm1M(int col);										// Ainda não implementado
 	double Matriz::m_PNorm2M();
 	void Matriz::m_Reset();
 	void Matriz::m_SetError(int errnbr);
@@ -78,7 +82,6 @@ public:
 	Matriz Matriz::Transpose();
 	double Matriz::PNorm(int p);
 	double Matriz::PNorm(int p, int pos);
-	Matriz Matriz::Mult(Matriz & A);
 	Matriz Matriz::Mult(double value);
 	bool Matriz::IsSquare();
 	bool Matriz::IsIdentity();
@@ -89,14 +92,16 @@ public:
 	bool Matriz::IsDiagonal();
 	double Matriz::Det();
 	double Matriz::Trace();
-	Matriz Matriz::Invert();
+	Matriz Matriz::Invert();										// Ainda não implementado
 	// ... válidos apenas para sistemas
 	bool Matriz::SolveG();
 	// ...... válidos apenas para sistemas triangulares
 	bool Matriz::SolveT(Matriz & A);
-	// ... válidos apenas para matrizes unidimensionais
+	// ... válidos apenas para matrizes
+	Matriz Matriz::Mult(Matriz & B);
+	// ..... válidos apenas para matrizes unidimensionais
 	Matriz Matriz::Outer(Matriz & A);
-	// ... válidos apenas para matrizes 1 x 1
+	// ...... válidos apenas para matrizes 1 x 1
 	operator double();
 
 protected:

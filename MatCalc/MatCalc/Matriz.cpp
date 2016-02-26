@@ -36,7 +36,7 @@ Matriz::Matriz(Matriz & A) {
 	m_SetError(0);
 	}
 
-Matriz::Matriz(Matriz & A, int row,int col) {
+Matriz::Matriz(Matriz & A, int row, int col) {
 	int nrows = A.m_nrow, ncols = A.m_ncol;
 	double * pvals;
 	int size = (nrows - 1) * (ncols - 1);
@@ -59,7 +59,10 @@ Matriz::Matriz(Matriz & A, int row,int col) {
 			}
 		++ idst;
 		}
+	m_Dispose();
+	* this = A;
 	m_pval = pvals;
+	--m_nrow, --m_ncol;
 	m_SetError(0);
 	}
 
@@ -85,14 +88,9 @@ Matriz::Matriz(int nrows, int ncols, bool initialize) {
 	m_nrow = nrows;
 	m_ncol = ncols;
 	m_initialized = initialize;
+	m_system = false;
 	m_pval = (double *) pvals;
 	m_SetError(0);
-	}
-
-void Matriz::m_Dispose() {
-	if (m_pval != NULL) {
-		free(m_pval);
-		}
 	}
 
 double Matriz::m_Det() {
@@ -112,9 +110,35 @@ double Matriz::m_Det() {
 	return 0;
 	}
 
+void Matriz::m_Dispose() {
+	if (m_pval != NULL) {
+		free(m_pval);
+		}
+	}
+
+int Matriz::m_FindMax(int pos, bool colmode, int start) {
+	double maxval = 0;
+	int i, address, maxpos = start;
+	int size = colmode ? m_nrow : m_ncol;
+	for (i = start; i < size; ++ i) {
+		if (colmode) {
+			address = i * m_ncol + pos;
+			}
+		else {
+			address = pos * m_nrow + i;
+			}
+		double value = fabs(m_pval[address]);
+		if (maxval < value) {
+			maxval = value;
+			maxpos = i;
+			}
+		}
+	return maxpos;
+	}
+
 void Matriz::m_Reset() {
 	m_nrow = m_ncol = 0;
-	m_initialized = false;
+	m_initialized = m_system = false;
 	m_pval = NULL;
 	}
 
@@ -284,6 +308,16 @@ void Matriz::m_TransposeNonSquare() {
 		}
 	free(m_pval);
 	m_pval = pvals;
+	}
+
+void Matriz::m_XchangeRows(int row1, int row2) {
+	int row1pos = row1 * m_ncol;
+	int row2pos = row2 * m_ncol;
+	for (int j = 0; j < m_ncol; ++ j) {
+		double value = m_pval[row1pos + j];
+		m_pval[row1pos + j] = m_pval[row2pos + j];
+		m_pval[row2pos + j] = m_pval[row1pos + j];
+		}
 	}
 
 bool Matriz::Initialized() {
@@ -597,6 +631,30 @@ bool Matriz::SolveT(Matriz & A) {
 		}
 	m_SetError(14);
 	return false;
+	}
+
+bool Matriz::SolveG() {
+	if (! m_system) {
+		m_SetError(15);
+		return false;
+		}
+	for (int j = 0; j < m_ncol - 1; ++ j) {
+		int maxrow = m_FindMax(j, true, j);
+		if (m_pval[maxrow * m_ncol + j] == 0) {
+			m_SetError(17);
+			return false;
+			}
+		m_XchangeRows(j, maxrow);
+		for (int i = j + 1; i < m_nrow; ++ i) {
+			double multiplier = m_pval[i * m_ncol + j] / m_pval[j * m_ncol + j];
+			m_pval[i * m_ncol + j] = 0;
+			for (int k = j + 1; k < m_ncol; ++ k) {
+				m_pval[i * m_ncol + k] -= m_pval[j * m_ncol + k] * multiplier;
+				}
+			}
+		}
+	m_SetError(0);
+	return true;
 	}
 
 Matriz Matriz::Outer(Matriz & A) {

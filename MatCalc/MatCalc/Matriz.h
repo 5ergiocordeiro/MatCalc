@@ -1,6 +1,7 @@
 #pragma once
 #define MATRIZ_MAX_ERRMSG_SIZE 255
 static char * m_errmsgtab[] = {
+	// 0
 	"Sucesso." ,
 	"Tamanho(s) inválido(s)! O número de linhas e o de colunas devem ser maiores que 0." ,
 	"Não conseguiu alocar memória para a matriz!" ,
@@ -11,6 +12,7 @@ static char * m_errmsgtab[] = {
 	"A matriz não é quadrada!" ,
 	"A matriz não corresponde a um sistema! O número de colunas deve ser igual ao número de linhas mais um." ,
 	"Pelo menos uma das matrizes não é unidimensional!"
+	// 10
 	"A matriz não é 1 x 1!"
 	"A matriz não é unidimensional!"
 	"Norma inválida! A norma vetorial deve ser igual a -1 (infinita), 0, 1 ou n (n > 0)."
@@ -39,6 +41,7 @@ private:
 	Matriz::Matriz(Matriz & A, int row, int col);
 	double Matriz::m_Det();
 	void Matriz::m_Dispose();
+	int Matriz::m_FindMax(int pos, bool colmode = true, int start = 0);
 	double Matriz::m_PNormInftyV();
 	double Matriz::m_PNorm0V();
 	double Matriz::m_PNorm1V();
@@ -54,6 +57,7 @@ private:
 	Matriz Matriz::m_SumSub(Matriz & A, bool IsSum);
 	void Matriz::m_TransposeSquare();
 	void Matriz::m_TransposeNonSquare();
+	void Matriz::m_XchangeRows(int row1, int row2);
 
 public:
 	Matriz::~Matriz();
@@ -86,6 +90,8 @@ public:
 	double Matriz::Det();
 	double Matriz::Trace();
 	Matriz Matriz::Invert();
+	// ... válidos apenas para sistemas
+	bool Matriz::SolveG();
 	// ...... válidos apenas para sistemas triangulares
 	bool Matriz::SolveT(Matriz & A);
 	// ... válidos apenas para matrizes unidimensionais

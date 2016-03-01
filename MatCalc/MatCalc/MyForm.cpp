@@ -37,9 +37,12 @@ void execClear(int var) {
 void execStore(int var) {
 	* Gpvar[var] = *T;
 	}
+
 void execReclaim(int var) {
 	* T = * Gpvar[var];
 	}
+
+bool execVal(char * txt, char * msgerr) { return false;  }
 
 
 [STAThread]

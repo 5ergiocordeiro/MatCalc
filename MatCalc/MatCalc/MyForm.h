@@ -17,6 +17,8 @@ void execCmd();
 void execClear(int var);
 void execStore(int var);
 void execReclaim(int var);
+bool execVal(char * txt, char * msgerr);
+
 
 namespace MatCalc {
 
@@ -26,6 +28,7 @@ namespace MatCalc {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Runtime::InteropServices;
 
 	/// <summary>
 	/// Summary for MyForm
@@ -35,6 +38,7 @@ namespace MatCalc {
 	private:
 		void clrAll() {
 			GMode = GVar = GLast = -1;
+			txtInput -> Text = "";
 			char msg[30];
 			sprintf_s(msg, "CLEAR ALL");
 			String^ msgitem = gcnew String(msg);
@@ -66,6 +70,40 @@ namespace MatCalc {
 			lstCurMode -> Items -> Add(msgitem);
 			lstHistory -> Items -> Add(msgitem);
 			lstHistory -> SelectedIndex = lstHistory -> Items -> Count - 1;
+			lstMsg->Items->Clear();
+			switch (mode) {
+				case 0:
+					btnPlus -> Enabled = false;
+					btnMinus -> Enabled = false;
+					btnTimes -> Enabled = false;
+					btnStore -> Enabled = true;
+					btnReclaim -> Enabled = true;
+					btnClear -> Enabled = true;
+					btnA -> Enabled = true;
+					btnB -> Enabled = true;
+					btnC -> Enabled = true;
+					btnD -> Enabled = true;
+					btnE -> Enabled = true;
+					btnF -> Enabled = true;
+					txtInput -> Enabled = true;
+					break;
+				case 2:
+					btnPlus -> Enabled = false;
+					btnMinus -> Enabled = false;
+					btnTimes -> Enabled = false;
+					btnStore -> Enabled = false;
+					btnReclaim -> Enabled = false;
+					btnClear -> Enabled = false;
+					btnA -> Enabled = false;
+					btnB -> Enabled = false;
+					btnC -> Enabled = false;
+					btnD -> Enabled = false;
+					btnE -> Enabled = false;
+					btnF -> Enabled = false;
+					txtInput -> Enabled = false;
+					break;
+		}
+
 			}
 		void updCmd(int cmd) {
 			GCmd = cmd;
@@ -75,6 +113,7 @@ namespace MatCalc {
 			String^ msgitem = gcnew String(msg);
 			lstHistory -> Items -> Add(msgitem);
 			lstHistory -> SelectedIndex = lstHistory -> Items -> Count - 1;
+			lstMsg->Items->Clear();
 			}
 		void updVar(int var) {
 			if (GCmd == -1) {
@@ -91,6 +130,22 @@ namespace MatCalc {
 			lstHistory->SelectedIndex = lstHistory->Items->Count - 1;
 			execCmd();
 			}
+		void updVal() {
+			lstMsg -> Items -> Clear();
+			char msg[30];
+			String^ msgerr = gcnew String("");
+			char * txt = (char *) Marshal::StringToHGlobalAnsi(txtInput -> Text).ToPointer();
+			bool valid = execVal(txt, msg);
+			Marshal::FreeHGlobal(IntPtr(txt));
+			if (! valid) {
+				lstMsg -> Items -> Add(msgerr);
+				return;
+				}
+			String^ msgitem = gcnew String("VALIDATE INPUT");
+			lstHistory -> Items -> Add(msgitem);
+			lstHistory -> SelectedIndex = lstHistory -> Items -> Count - 1;
+			}
+
 	public:
 		MyForm(void)
 		{
@@ -117,7 +172,8 @@ namespace MatCalc {
 	private: System::Windows::Forms::ListBox^  lstCurMode;
 	private: System::Windows::Forms::Panel^  panel1;
 	private: System::Windows::Forms::DataGridView^  dataGridView1;
-	private: System::Windows::Forms::TextBox^  textBox1;
+	private: System::Windows::Forms::TextBox^  txtInput;
+
 	private: System::Windows::Forms::ListBox^  lstHistory;
 	private: System::Windows::Forms::ListBox^  lstMsg;
 	private: System::Windows::Forms::Button^  btnCalc;
@@ -136,6 +192,10 @@ namespace MatCalc {
 	private: System::Windows::Forms::Button^  btnPlus;
 	private: System::Windows::Forms::Button^  btnMinus;
 	private: System::Windows::Forms::Button^  btnTimes;
+private: System::Windows::Forms::Button^  btnD;
+private: System::Windows::Forms::Button^  btnE;
+private: System::Windows::Forms::Button^  btnF;
+private: System::Windows::Forms::Button^  btnVal;
 
 	private:
 		/// <summary>
@@ -155,7 +215,7 @@ namespace MatCalc {
 			this->lstCurMode = (gcnew System::Windows::Forms::ListBox());
 			this->panel1 = (gcnew System::Windows::Forms::Panel());
 			this->dataGridView1 = (gcnew System::Windows::Forms::DataGridView());
-			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
+			this->txtInput = (gcnew System::Windows::Forms::TextBox());
 			this->lstHistory = (gcnew System::Windows::Forms::ListBox());
 			this->lstMsg = (gcnew System::Windows::Forms::ListBox());
 			this->btnCalc = (gcnew System::Windows::Forms::Button());
@@ -174,6 +234,10 @@ namespace MatCalc {
 			this->btnPlus = (gcnew System::Windows::Forms::Button());
 			this->btnMinus = (gcnew System::Windows::Forms::Button());
 			this->btnTimes = (gcnew System::Windows::Forms::Button());
+			this->btnD = (gcnew System::Windows::Forms::Button());
+			this->btnE = (gcnew System::Windows::Forms::Button());
+			this->btnF = (gcnew System::Windows::Forms::Button());
+			this->btnVal = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->dataGridView1))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -231,19 +295,24 @@ namespace MatCalc {
 			this->dataGridView1->Size = System::Drawing::Size(240, 150);
 			this->dataGridView1->TabIndex = 4;
 			// 
-			// textBox1
+			// txtInput
 			// 
-			this->textBox1->Location = System::Drawing::Point(1031, 249);
-			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(100, 20);
-			this->textBox1->TabIndex = 5;
+			this->txtInput->BorderStyle = System::Windows::Forms::BorderStyle::FixedSingle;
+			this->txtInput->Font = (gcnew System::Drawing::Font(L"Courier New", 8, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->txtInput->Location = System::Drawing::Point(4, 383);
+			this->txtInput->Multiline = true;
+			this->txtInput->Name = L"txtInput";
+			this->txtInput->Size = System::Drawing::Size(781, 150);
+			this->txtInput->TabIndex = 3;
+			this->txtInput->WordWrap = false;
 			// 
 			// lstHistory
 			// 
 			this->lstHistory->BorderStyle = System::Windows::Forms::BorderStyle::None;
 			this->lstHistory->CausesValidation = false;
 			this->lstHistory->Enabled = false;
-			this->lstHistory->Font = (gcnew System::Drawing::Font(L"Segoe UI", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->lstHistory->Font = (gcnew System::Drawing::Font(L"Segoe UI", 12, System::Drawing::FontStyle::Italic, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->lstHistory->FormattingEnabled = true;
 			this->lstHistory->ItemHeight = 21;
@@ -386,7 +455,7 @@ namespace MatCalc {
 			this->btnCls->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 16, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->btnCls->ForeColor = System::Drawing::SystemColors::WindowText;
-			this->btnCls->Location = System::Drawing::Point(434, 198);
+			this->btnCls->Location = System::Drawing::Point(525, 198);
 			this->btnCls->Name = L"btnCls";
 			this->btnCls->Size = System::Drawing::Size(75, 53);
 			this->btnCls->TabIndex = 16;
@@ -400,7 +469,7 @@ namespace MatCalc {
 			this->btnCE->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 16, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->btnCE->ForeColor = System::Drawing::SystemColors::WindowText;
-			this->btnCE->Location = System::Drawing::Point(353, 198);
+			this->btnCE->Location = System::Drawing::Point(444, 198);
 			this->btnCE->Name = L"btnCE";
 			this->btnCE->Size = System::Drawing::Size(75, 53);
 			this->btnCE->TabIndex = 17;
@@ -431,10 +500,10 @@ namespace MatCalc {
 			this->lvwHistory->Font = (gcnew System::Drawing::Font(L"Segoe UI", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->lvwHistory->HeaderStyle = System::Windows::Forms::ColumnHeaderStyle::None;
-			this->lvwHistory->Location = System::Drawing::Point(4, 377);
+			this->lvwHistory->Location = System::Drawing::Point(1242, 383);
 			this->lvwHistory->MultiSelect = false;
 			this->lvwHistory->Name = L"lvwHistory";
-			this->lvwHistory->Size = System::Drawing::Size(783, 97);
+			this->lvwHistory->Size = System::Drawing::Size(225, 97);
 			this->lvwHistory->TabIndex = 19;
 			this->lvwHistory->TabStop = false;
 			this->lvwHistory->UseCompatibleStateImageBehavior = false;
@@ -445,7 +514,7 @@ namespace MatCalc {
 			this->btnPlus->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->btnPlus->ForeColor = System::Drawing::SystemColors::Window;
-			this->btnPlus->Location = System::Drawing::Point(515, 198);
+			this->btnPlus->Location = System::Drawing::Point(525, 257);
 			this->btnPlus->Name = L"btnPlus";
 			this->btnPlus->Size = System::Drawing::Size(75, 23);
 			this->btnPlus->TabIndex = 20;
@@ -458,7 +527,7 @@ namespace MatCalc {
 			this->btnMinus->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->btnMinus->ForeColor = System::Drawing::SystemColors::Window;
-			this->btnMinus->Location = System::Drawing::Point(515, 228);
+			this->btnMinus->Location = System::Drawing::Point(525, 286);
 			this->btnMinus->Name = L"btnMinus";
 			this->btnMinus->Size = System::Drawing::Size(75, 23);
 			this->btnMinus->TabIndex = 21;
@@ -471,12 +540,65 @@ namespace MatCalc {
 			this->btnTimes->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->btnTimes->ForeColor = System::Drawing::SystemColors::Window;
-			this->btnTimes->Location = System::Drawing::Point(515, 257);
+			this->btnTimes->Location = System::Drawing::Point(525, 315);
 			this->btnTimes->Name = L"btnTimes";
 			this->btnTimes->Size = System::Drawing::Size(75, 23);
 			this->btnTimes->TabIndex = 22;
 			this->btnTimes->Text = L"x";
 			this->btnTimes->UseVisualStyleBackColor = false;
+			// 
+			// btnD
+			// 
+			this->btnD->BackColor = System::Drawing::SystemColors::WindowText;
+			this->btnD->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->btnD->ForeColor = System::Drawing::SystemColors::Window;
+			this->btnD->Location = System::Drawing::Point(619, 285);
+			this->btnD->Name = L"btnD";
+			this->btnD->Size = System::Drawing::Size(75, 23);
+			this->btnD->TabIndex = 23;
+			this->btnD->Text = L"D";
+			this->btnD->UseVisualStyleBackColor = false;
+			// 
+			// btnE
+			// 
+			this->btnE->BackColor = System::Drawing::SystemColors::WindowText;
+			this->btnE->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->btnE->ForeColor = System::Drawing::SystemColors::Window;
+			this->btnE->Location = System::Drawing::Point(619, 314);
+			this->btnE->Name = L"btnE";
+			this->btnE->Size = System::Drawing::Size(75, 23);
+			this->btnE->TabIndex = 24;
+			this->btnE->Text = L"E";
+			this->btnE->UseVisualStyleBackColor = false;
+			// 
+			// btnF
+			// 
+			this->btnF->BackColor = System::Drawing::SystemColors::WindowText;
+			this->btnF->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->btnF->ForeColor = System::Drawing::SystemColors::Window;
+			this->btnF->Location = System::Drawing::Point(619, 343);
+			this->btnF->Name = L"btnF";
+			this->btnF->Size = System::Drawing::Size(75, 23);
+			this->btnF->TabIndex = 25;
+			this->btnF->Text = L"F";
+			this->btnF->UseVisualStyleBackColor = false;
+			// 
+			// btnVal
+			// 
+			this->btnVal->BackColor = System::Drawing::SystemColors::WindowText;
+			this->btnVal->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->btnVal->ForeColor = System::Drawing::SystemColors::Window;
+			this->btnVal->Location = System::Drawing::Point(708, 343);
+			this->btnVal->Name = L"btnVal";
+			this->btnVal->Size = System::Drawing::Size(75, 23);
+			this->btnVal->TabIndex = 26;
+			this->btnVal->Text = L"VAL";
+			this->btnVal->UseVisualStyleBackColor = false;
+			this->btnVal->Click += gcnew System::EventHandler(this, &MyForm::btnVal_Click);
 			// 
 			// MyForm
 			// 
@@ -484,6 +606,10 @@ namespace MatCalc {
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackColor = System::Drawing::SystemColors::ControlDark;
 			this->ClientSize = System::Drawing::Size(1486, 535);
+			this->Controls->Add(this->btnVal);
+			this->Controls->Add(this->btnF);
+			this->Controls->Add(this->btnE);
+			this->Controls->Add(this->btnD);
 			this->Controls->Add(this->btnTimes);
 			this->Controls->Add(this->btnMinus);
 			this->Controls->Add(this->btnPlus);
@@ -501,7 +627,7 @@ namespace MatCalc {
 			this->Controls->Add(this->btnCalc);
 			this->Controls->Add(this->lstHistory);
 			this->Controls->Add(this->lstMsg);
-			this->Controls->Add(this->textBox1);
+			this->Controls->Add(this->txtInput);
 			this->Controls->Add(this->dataGridView1);
 			this->Controls->Add(this->panel1);
 			this->Controls->Add(this->lbl);
@@ -551,6 +677,9 @@ namespace MatCalc {
 			}
 		System::Void btnClear_Click(System::Object^  sender, System::EventArgs^  e) {
 			updCmd(2);
+			}
+		System::Void btnVal_Click(System::Object^  sender, System::EventArgs^  e) {
+			updVal();
 			}
 		};
 	}

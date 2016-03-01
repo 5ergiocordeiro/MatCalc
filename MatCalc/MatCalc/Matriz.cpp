@@ -6,34 +6,12 @@
 Ver arquivo "Matriz.h" para documentação.
 */
 
-Matriz::~Matriz() {
-	m_Dispose();
-	}
-
 Matriz::Matriz() {
-	m_Reset();
-	m_Dispose();
-	m_SetError(0);
+	Clear();
 	}
 
-Matriz::Matriz(Matriz & A) {
-	if (! A.m_initialized) {
-		m_SetError(6);
-		return;
-		}
-	void * pvals;
-	int size = A.m_ncol * A.m_nrow;
-	pvals = malloc(size * sizeof(double));
-	if (pvals = NULL) {
-		m_Reset();
-		m_SetError(2);
-		return;
-		}
-	memcpy(pvals, A.m_pval, size);
-	m_Dispose();
+Matriz::Matriz(const Matriz & A) {
 	* this = A;
-	m_pval = (double *) pvals;
-	m_SetError(0);
 	}
 
 Matriz::Matriz(Matriz & A, int row, int col) {
@@ -317,6 +295,13 @@ void Matriz::m_XchangeRows(int row1, int row2) {
 		}
 	}
 
+void Matriz::Clear() {
+	m_Reset();
+	m_Dispose();
+	m_SetError(0);
+	return;
+	}
+
 bool Matriz::Initialized() {
 	m_SetError(0);
 	return m_initialized;
@@ -533,6 +518,27 @@ bool Matriz::IsSimmetric() {
 	return result;
 	}
 
+Matriz & Matriz::operator=(const Matriz & A) {
+	if (! A.m_initialized) {
+		m_SetError(6);
+		return *this;
+		}
+	void * pvals;
+	int size = A.m_ncol * A.m_nrow;
+	pvals = malloc(size * sizeof(double));
+	if (pvals = NULL) {
+		m_Reset();
+		m_SetError(2);
+		return * this;
+		}
+	memcpy(pvals, A.m_pval, size);
+	m_Dispose();
+	memcpy(this, &A, sizeof(Matriz));
+	m_pval = (double *) pvals;
+	m_SetError(0);
+	return *this;
+	}
+
 bool Matriz::IsTriangularL() {
 	if (! IsSquare()) {
 		return false;
@@ -710,4 +716,8 @@ Matriz::operator double() {
 		}
 	m_SetError(0);
 	return m_pval[0];
+	}
+
+Matriz::~Matriz() {
+	m_Dispose();
 	}

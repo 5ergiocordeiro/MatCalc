@@ -1,17 +1,17 @@
-﻿Build started 26/02/2016 14:36:43.
+﻿Build started 01/03/2016 17:01:31.
      1>Project "C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\MatCalc\MatCalc.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Yu"stdafx.h" /Fp"Debug\MatCalc.pch" /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Matriz.cpp
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\\" /AI"C:\Program Files (x86)\Windows Kits\8.1\References\CommonConfiguration\Neutral" /AI"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\Facades\\" /Zi /clr /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _UNICODE /D UNICODE /EHa /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /TP /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\mscorlib.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Data.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Drawing.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Windows.Forms.dll" /FU"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.2\System.Xml.dll" /analyze- /errorReport:prompt /clr:nostdlib Matriz.cpp
          Matriz.cpp
-     1>c:\users\asus.1\documents\visual studio 2015\projects\matcalc\matcalc\matriz.cpp(473): warning C4715: 'Matriz::PNorm': not all control paths return a value
+     1>c:\users\asus.1\documents\visual studio 2015\projects\matcalc\matcalc\matriz.cpp(458): warning C4715: 'Matriz::PNorm': not all control paths return a value
        Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\Debug\MatCalc.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\Debug\MatCalc.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\Debug\MatCalc.lib" /MACHINE:X86 Debug\MatCalc.res
-         Debug\MatCalc.obj
-         Debug\Matriz.obj
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\Debug\MatCalc.exe" /INCREMENTAL /NOLOGO /ASSEMBLYRESOURCE:Debug\MatCalc.MyForm.resources /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\Debug\MatCalc.pdb" /ASSEMBLYDEBUG /SUBSYSTEM:WINDOWS /TLBID:1 /ENTRY:"main" /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 Debug\Matriz.obj
+         Debug\MyForm.obj
          Debug\stdafx.obj
+         "Debug\.NETFramework,Version=v4.5.2.AssemblyAttributes.obj"
          MatCalc.vcxproj -> C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\Debug\MatCalc.exe
      1>Done Building Project "C:\Users\ASUS.1\Documents\Visual Studio 2015\Projects\MatCalc\MatCalc\MatCalc.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:04.92
+Time Elapsed 00:00:01.69

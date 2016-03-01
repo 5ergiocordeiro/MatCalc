@@ -64,14 +64,14 @@ private:
 	void Matriz::m_XchangeRows(int row1, int row2);
 
 public:
-	Matriz::~Matriz();
 	Matriz::Matriz();
-	Matriz::Matriz(Matriz & A);
+	Matriz::Matriz(const Matriz & A);
 	Matriz::Matriz(int nrows, int ncols, bool initialize = false);
-	bool Initialized();
-	Matriz Initialized (bool value);
-	bool IsSystem();
-	Matriz IsSystem(bool value);
+	void Matriz::Clear();
+	bool Matriz::Initialized();
+	Matriz Matriz::Initialized (bool value);
+	bool Matriz::IsSystem();
+	Matriz Matriz::IsSystem(bool value);
 	double Matriz::SetVal(int nrow, int ncol, double value);
 	int Matriz::GetSize(int ndimen = 1);
 	// Válidos apenas para matrizes já inicializadas
@@ -86,6 +86,7 @@ public:
 	bool Matriz::IsSquare();
 	bool Matriz::IsIdentity();
 	bool Matriz::IsSimmetric();
+	Matriz & Matriz::operator=(const Matriz & A);
 	// ... válidos apenas para matrizes quadradas e sistemas
 	bool Matriz::IsTriangularU();
 	bool Matriz::IsTriangularL();
@@ -105,6 +106,7 @@ public:
 	operator double();
 
 protected:
+	virtual Matriz::~Matriz();
 	double Matriz::GetValRaw(int pos);
 };
 
